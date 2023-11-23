@@ -13,11 +13,11 @@ from mmaction.registry import TRANSFORMS
 from .loading import DecordDecode, DecordInit
 from .processing import _combine_quadruple
 
-if pv.parse(scipy.__version__) < pv.parse('1.11.0'):
-    get_mode = mode
-else:
-    from functools import partial
-    get_mode = partial(mode, keepdims=True)
+# if pv.parse(scipy.__version__) < pv.parse('1.11.0'):
+#     get_mode = mode
+# else:
+from functools import partial
+get_mode = partial(mode, keepdims=True)
 
 
 @TRANSFORMS.register_module()
@@ -58,6 +58,9 @@ class DecompressPose(BaseTransform):
             results (dict): The resulting dict to be modified and passed
                 to the next transform in pipeline.
         """
+
+        if results['dataset'] != 'k400':
+            return results
         required_keys = ['total_frames', 'frame_inds', 'keypoint']
         for k in required_keys:
             assert k in results
@@ -85,7 +88,7 @@ class DecompressPose(BaseTransform):
 
         results['total_frames'] = total_frames
 
-        num_joints = keypoint.shape[1]
+        num_joints = keypoint.shape[1] # frames,joints,3
         num_person = get_mode(frame_inds)[-1][0]
 
         new_kp = np.zeros([num_person, total_frames, num_joints, 2],

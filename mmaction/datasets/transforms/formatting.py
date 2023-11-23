@@ -89,8 +89,8 @@ class PackActionInputs(BaseTransform):
                 data_sample.proposals = InstanceData(
                     bboxes=to_tensor(results['proposals']))
 
-        if 'label' in results:
-            data_sample.set_gt_label(results['label'])
+        # if 'sports_label' in results:
+        data_sample.set_gt_label(results['sports_label'])
 
         # Set custom algorithm keys
         for key in self.algorithm_keys:

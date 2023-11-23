@@ -105,11 +105,12 @@ class PoseDataset(BaseActionDataset):
         data_info = super().get_data_info(idx)
 
         # Sometimes we may need to load skeleton from the file
-        if 'skeleton' in self.data_prefix:
+        if 'skeleton' in self.data_prefix or data_info['dataset'] == 'k400':
+            data_prefix = {'skeleton': '../aigc-data/kpfiles'}
             identifier = 'filename' if 'filename' in data_info \
                 else 'frame_dir'
             ske_name = data_info[identifier]
-            ske_path = osp.join(self.data_prefix['skeleton'],
+            ske_path = osp.join(data_prefix['skeleton'],
                                 ske_name + '.pkl')
             ske = mmengine.load(ske_path)
             for k in ske:
