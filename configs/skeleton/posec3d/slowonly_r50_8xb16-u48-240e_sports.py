@@ -20,12 +20,12 @@ model = dict(
     cls_head=dict(
         type='I3DHead',
         in_channels=512,
-        num_classes=89,
+        num_classes=69,
         dropout_ratio=0.5,
         average_clips='prob'))
 
 dataset_type = 'PoseDataset'
-ann_file = '../aigc-data/sports_resplit.pkl'
+ann_file = '../aigc-data/arthub_mmact.pkl'
 left_kp = [1, 3, 5, 7, 9, 11, 13, 15]
 right_kp = [2, 4, 6, 8, 10, 12, 14, 16]
 train_pipeline = [
@@ -80,7 +80,7 @@ test_pipeline = [
         left_kp=left_kp,
         right_kp=right_kp),
     dict(type='FormatShape', input_format='NCTHW_Heatmap'),
-    dict(type='PackActionInputs')
+    dict(type='PackActionInputs',meta_keys=('img_shape', 'img_key', 'video_id', 'timestamp', 'frame_dir', "sql_id"))
 ]
 
 train_dataloader = dict(
@@ -108,7 +108,7 @@ val_dataloader = dict(
         pipeline=val_pipeline,
         test_mode=True))
 test_dataloader = dict(
-    batch_size=1,
+    batch_size=4,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -119,7 +119,7 @@ test_dataloader = dict(
         pipeline=test_pipeline,
         test_mode=True))
 
-val_evaluator = [dict(type='AccMetric')]
+val_evaluator = [dict(type='AccMetric'), dict(type='ClsScoreSaver', save_path='cls_score.pkl', labels_file='data/scripts/sports_label_merged_69.txt')]
 test_evaluator = val_evaluator
 
 train_cfg = dict(
